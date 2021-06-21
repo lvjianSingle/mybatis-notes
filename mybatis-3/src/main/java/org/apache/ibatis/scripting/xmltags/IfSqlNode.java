@@ -19,8 +19,11 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 public class IfSqlNode implements SqlNode {
+  // evaluator属性用于解析OGNL表达式
   private final ExpressionEvaluator evaluator;
+  // 保存<if>标签test属性内容
   private final String test;
+  // <if>标签内Sql内容
   private final SqlNode contents;
 
   public IfSqlNode(SqlNode contents, String test) {
@@ -31,6 +34,7 @@ public class IfSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 如果OGNL表达式值为true,则调用<if>标签内容对应的SqlNode的apply（）方法
     if (evaluator.evaluateBoolean(test, context.getBindings())) {
       contents.apply(context);
       return true;

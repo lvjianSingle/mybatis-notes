@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2016 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,19 +25,21 @@ import java.util.Properties;
 @Intercepts({})
 public class ExamplePlugin implements Interceptor {
   private Properties properties;
-
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
+    // TODO:自定义拦截逻辑
     return invocation.proceed();
   }
 
   @Override
   public Object plugin(Object target) {
+    // 调用Plugin类的wrap（）方法返回一个动态代理对象
     return Plugin.wrap(target, this);
   }
 
   @Override
   public void setProperties(Properties properties) {
+    // 设置插件的属性信息
     this.properties = properties;
   }
 

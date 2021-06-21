@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,39 +15,46 @@
  */
 package org.apache.ibatis.mapping;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+import org.apache.ibatis.reflection.Jdk;
 import org.apache.ibatis.reflection.ParamNameUtil;
 import org.apache.ibatis.session.Configuration;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.util.*;
 
 /**
  * @author Clinton Begin
  */
 public class ResultMap {
   private Configuration configuration;
-
+  // <resultMap>标签id属性
   private String id;
+  // <resultMap>标签type属性
   private Class<?> type;
+  // <result>标签配置的映射信息
   private List<ResultMapping> resultMappings;
+  // <id>标签配置的主键映射信息
   private List<ResultMapping> idResultMappings;
+  // <constructor>标签配置的构造器映射信息
   private List<ResultMapping> constructorResultMappings;
+  // <result>标签配置的结果集映射信息
   private List<ResultMapping> propertyResultMappings;
+  // 存放所有映射的数据库字段信息,当使用columnPrefix配置字段前缀时，所有字段都会追加前缀
   private Set<String> mappedColumns;
+  // 存放所有映射的属性信息
   private Set<String> mappedProperties;
+  // <discriminator>标签配置的鉴别器信息
   private Discriminator discriminator;
+  // 是否有嵌套的<resultMap>
   private boolean hasNestedResultMaps;
+  // 是否有存在嵌套查询
   private boolean hasNestedQueries;
+  // autoMapping属性值，是否自动映射
   private Boolean autoMapping;
 
   private ResultMap() {
@@ -83,12 +90,13 @@ public class ResultMap {
       if (resultMap.id == null) {
         throw new IllegalArgumentException("ResultMaps must have an id");
       }
-      resultMap.mappedColumns = new HashSet<>();
-      resultMap.mappedProperties = new HashSet<>();
-      resultMap.idResultMappings = new ArrayList<>();
-      resultMap.constructorResultMappings = new ArrayList<>();
-      resultMap.propertyResultMappings = new ArrayList<>();
-      final List<String> constructorArgNames = new ArrayList<>();
+      resultMap.mappedColumns = new HashSet<String>();
+      resultMap.mappedProperties = new HashSet<String>();
+      // 將ResultMapping对象进行分类
+      resultMap.idResultMappings = new ArrayList<ResultMapping>();
+      resultMap.constructorResultMappings = new ArrayList<ResultMapping>();
+      resultMap.propertyResultMappings = new ArrayList<ResultMapping>();
+      final List<String> constructorArgNames = new ArrayList<String>();
       for (ResultMapping resultMapping : resultMap.resultMappings) {
         resultMap.hasNestedQueries = resultMap.hasNestedQueries || resultMapping.getNestedQueryId() != null;
         resultMap.hasNestedResultMaps = resultMap.hasNestedResultMaps || (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null);
@@ -130,13 +138,16 @@ public class ResultMap {
               + resultMap.getType().getName() + "' by arg names " + constructorArgNames
               + ". There might be more info in debug log.");
         }
-        Collections.sort(resultMap.constructorResultMappings, (o1, o2) -> {
-          int paramIdx1 = actualArgNames.indexOf(o1.getProperty());
-          int paramIdx2 = actualArgNames.indexOf(o2.getProperty());
-          return paramIdx1 - paramIdx2;
+        Collections.sort(resultMap.constructorResultMappings, new Comparator<ResultMapping>() {
+          @Override
+          public int compare(ResultMapping o1, ResultMapping o2) {
+            int paramIdx1 = actualArgNames.indexOf(o1.getProperty());
+            int paramIdx2 = actualArgNames.indexOf(o2.getProperty());
+            return paramIdx1 - paramIdx2;
+          }
         });
       }
-      // lock down collections
+      // ResultMap创建完毕后，属性不允许修改
       resultMap.resultMappings = Collections.unmodifiableList(resultMap.resultMappings);
       resultMap.idResultMappings = Collections.unmodifiableList(resultMap.idResultMappings);
       resultMap.constructorResultMappings = Collections.unmodifiableList(resultMap.constructorResultMappings);
@@ -180,7 +191,7 @@ public class ResultMap {
     }
 
     private List<String> getArgNames(Constructor<?> constructor) {
-      List<String> paramNames = new ArrayList<>();
+      List<String> paramNames = new ArrayList<String>();
       List<String> actualParamNames = null;
       final Annotation[][] paramAnnotations = constructor.getParameterAnnotations();
       int paramCount = paramAnnotations.length;
@@ -192,7 +203,7 @@ public class ResultMap {
             break;
           }
         }
-        if (name == null && resultMap.configuration.isUseActualParamName()) {
+        if (name == null && resultMap.configuration.isUseActualParamName() && Jdk.parameterExists) {
           if (actualParamNames == null) {
             actualParamNames = ParamNameUtil.getParamNames(constructor);
           }
@@ -253,7 +264,7 @@ public class ResultMap {
   public void forceNestedResultMaps() {
     hasNestedResultMaps = true;
   }
-
+  
   public Boolean getAutoMapping() {
     return autoMapping;
   }

@@ -24,11 +24,10 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public final class ImmutablePOJOTest {
 
@@ -37,7 +36,7 @@ public final class ImmutablePOJOTest {
 
   private static SqlSessionFactory factory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setupClass() throws Exception {
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/immutable_constructor/ibatisConfig.xml")) {
       factory = new SqlSessionFactoryBuilder().build(reader);
@@ -58,14 +57,13 @@ public final class ImmutablePOJOTest {
     }
   }
 
-  @Test
+
+  @Test(expected=PersistenceException.class)
   public void shouldFailLoadingImmutablePOJO() {
     try (SqlSession session = factory.openSession()) {
       final ImmutablePOJOMapper mapper = session.getMapper(ImmutablePOJOMapper.class);
-      Assertions.assertThrows(PersistenceException.class, () -> {
-        mapper.getImmutablePOJONoMatchingConstructor(POJO_ID);
-      });
+      mapper.getImmutablePOJONoMatchingConstructor(POJO_ID);
     }
   }
-
+  
 }

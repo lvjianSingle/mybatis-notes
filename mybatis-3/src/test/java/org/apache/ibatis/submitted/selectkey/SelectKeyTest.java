@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2018 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.Reader;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class SelectKeyTest {
 
   protected static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeEach
+  @Before
   public void setUp() throws Exception {
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/selectkey/MapperConfig.xml")) {
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
@@ -62,7 +61,7 @@ public class SelectKeyTest {
   @Test
   public void testInsertTable1() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Map<String, String> parms = new HashMap<>();
+      Map<String, String> parms = new HashMap<String, String>();
       parms.put("name", "Fred");
       int rows = sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table1.insert", parms);
       assertEquals(1, rows);
@@ -73,7 +72,7 @@ public class SelectKeyTest {
   @Test
   public void testInsertTable2() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Map<String, String> parms = new HashMap<>();
+      Map<String, String> parms = new HashMap<String, String>();
       parms.put("name", "Fred");
       int rows = sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insert", parms);
       assertEquals(1, rows);
@@ -81,26 +80,24 @@ public class SelectKeyTest {
     }
   }
 
-  @Test
+  @Test(expected=PersistenceException.class)
   public void testSeleckKeyReturnsNoData() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Map<String, String> parms = new HashMap<>();
+      Map<String, String> parms = new HashMap<String, String>();
       parms.put("name", "Fred");
-      Assertions.assertThrows(PersistenceException.class, () -> {
-        sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertNoValuesInSelectKey", parms);
-      });
+      int rows = sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertNoValuesInSelectKey", parms);
+      assertEquals(1, rows);
+      assertNull(parms.get("id"));
     }
   }
 
-  @Test
+  @Test(expected=PersistenceException.class)
   public void testSeleckKeyReturnsTooManyData() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Map<String, String> parms = new HashMap<>();
+      Map<String, String> parms = new HashMap<String, String>();
       parms.put("name", "Fred");
       sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertTooManyValuesInSelectKey", parms);
-      Assertions.assertThrows(PersistenceException.class, () -> {
-        sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertTooManyValuesInSelectKey", parms);
-      });
+      sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertTooManyValuesInSelectKey", parms);
     }
   }
 
@@ -130,7 +127,7 @@ public class SelectKeyTest {
   }
 
   @Test
-  @Disabled("HSQLDB is not returning the generated column after the update")
+  @Ignore("HSQLDB is not returning the generated column after the update")
   public void testAnnotatedUpdateTable2WithGeneratedKey() {
       try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
         Name name = new Name();
@@ -140,7 +137,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-
+        
         name.setName("Wilma");
         rows = mapper.updateTable2WithGeneratedKey(name);
         assertEquals(1, rows);
@@ -150,7 +147,7 @@ public class SelectKeyTest {
   }
 
   @Test
-  @Disabled("HSQLDB is not returning the generated column after the update")
+  @Ignore("HSQLDB is not returning the generated column after the update")
   public void testAnnotatedUpdateTable2WithGeneratedKeyXml() {
       try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
         Name name = new Name();
@@ -160,7 +157,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-
+        
         name.setName("Wilma");
         rows = mapper.updateTable2WithGeneratedKeyXml(name);
         assertEquals(1, rows);
@@ -205,7 +202,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-
+        
         name.setName("Wilma");
         rows = mapper.updateTable2WithSelectKeyWithKeyMap(name);
         assertEquals(1, rows);
@@ -334,14 +331,12 @@ public class SelectKeyTest {
       }
   }
 
-  @Test
+  @Test(expected = PersistenceException.class)
   public void testSeleckKeyWithWrongKeyProperty() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Name name = new Name();
       name.setName("Kyoto");
-      Assertions.assertThrows(PersistenceException.class, () -> {
-        sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertWrongKeyProperty", name);
-      });
+      sqlSession.insert("org.apache.ibatis.submitted.selectkey.Table2.insertWrongKeyProperty", name);
     }
   }
 }

@@ -21,7 +21,9 @@ import java.util.List;
  * @author Clinton Begin
  */
 public class ChooseSqlNode implements SqlNode {
+  // <otherwise>标签对应的SqlNode对象
   private final SqlNode defaultSqlNode;
+  // 所有<when>标签对应的SqlNode，每个<when>标签通过IfSqlNode描述
   private final List<SqlNode> ifSqlNodes;
 
   public ChooseSqlNode(List<SqlNode> ifSqlNodes, SqlNode defaultSqlNode) {
@@ -31,11 +33,13 @@ public class ChooseSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 遍历所有<when>标签对应的SqlNode，条件满足则返回true
     for (SqlNode sqlNode : ifSqlNodes) {
       if (sqlNode.apply(context)) {
         return true;
       }
     }
+    // 所有<when>标签条件不满足，则执行<otherwise>对应的SqlNode
     if (defaultSqlNode != null) {
       defaultSqlNode.apply(context);
       return true;

@@ -15,7 +15,7 @@
  */
 package org.apache.ibatis.submitted.typehandler;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.Reader;
 
@@ -29,15 +29,14 @@ import org.apache.ibatis.submitted.typehandler.Product.ConstantProductIdTypeHand
 import org.apache.ibatis.submitted.typehandler.Product.ProductId;
 import org.apache.ibatis.submitted.typehandler.Product.ProductIdTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TypeHandlerTest {
 
   private SqlSessionFactory sqlSessionFactory;
 
-  @BeforeEach
+  @Before
   public void setUp() throws Exception {
     // create a SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/typehandler/mybatis-config.xml")) {
@@ -132,14 +131,12 @@ public class TypeHandlerTest {
     }
   }
 
-  @Test
+  @Test(expected = BuilderException.class)
   public void shouldFailIfMultipleHandlerMappedToAType() {
     sqlSessionFactory.getConfiguration().getTypeHandlerRegistry().register(ProductId.class, JdbcType.BIGINT, ConstantProductIdTypeHandler.class);
     // multiple type handlers are mapped to ProductId and
     // none of them are mapped to null jdbcType.
-    Assertions.assertThrows(BuilderException.class,  () -> {
-      addMapper();
-    });
+    addMapper();
   }
 
   @Test

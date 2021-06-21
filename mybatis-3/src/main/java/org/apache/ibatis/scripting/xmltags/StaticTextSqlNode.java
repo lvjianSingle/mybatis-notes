@@ -19,6 +19,7 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 public class StaticTextSqlNode implements SqlNode {
+  // 静态SQL文本内容
   private final String text;
 
   public StaticTextSqlNode(String text) {
@@ -27,6 +28,7 @@ public class StaticTextSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 追加SQL内容
     context.appendSql(text);
     return true;
   }

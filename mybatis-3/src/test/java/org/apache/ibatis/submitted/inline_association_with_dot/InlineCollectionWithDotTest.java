@@ -15,7 +15,7 @@
  */
 package org.apache.ibatis.submitted.inline_association_with_dot;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.Reader;
 
@@ -24,8 +24,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Test;
 
 public class InlineCollectionWithDotTest {
 
@@ -45,7 +45,7 @@ public class InlineCollectionWithDotTest {
     }
   }
 
-  @AfterEach
+  @After
   public void closeSession() {
     if (sqlSession != null) {
       sqlSession.close();

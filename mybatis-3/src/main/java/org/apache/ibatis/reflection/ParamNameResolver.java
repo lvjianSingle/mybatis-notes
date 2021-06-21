@@ -15,18 +15,18 @@
  */
 package org.apache.ibatis.reflection;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.binding.MapperMethod.ParamMap;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.binding.MapperMethod.ParamMap;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ResultHandler;
-import org.apache.ibatis.session.RowBounds;
 
 public class ParamNameResolver {
 
@@ -50,42 +50,49 @@ public class ParamNameResolver {
   private boolean hasParamAnnotation;
 
   public ParamNameResolver(Configuration config, Method method) {
+    // 获取所有参数类型
     final Class<?>[] paramTypes = method.getParameterTypes();
+    // 获取所有参数注解
     final Annotation[][] paramAnnotations = method.getParameterAnnotations();
-    final SortedMap<Integer, String> map = new TreeMap<>();
+    final SortedMap<Integer, String> map = new TreeMap<Integer, String>();
     int paramCount = paramAnnotations.length;
-    // get names from @Param annotations
+    // 从@Param 注解中获取参数名称
     for (int paramIndex = 0; paramIndex < paramCount; paramIndex++) {
       if (isSpecialParameter(paramTypes[paramIndex])) {
-        // skip special parameters
         continue;
       }
       String name = null;
       for (Annotation annotation : paramAnnotations[paramIndex]) {
+        // 方法参数中，是否有Param注解
         if (annotation instanceof Param) {
           hasParamAnnotation = true;
+          // 获取参数名称
           name = ((Param) annotation).value();
           break;
         }
       }
       if (name == null) {
-        // @Param was not specified.
+        // 未指定@Param 注解,这判断是否使用实际的参数名称，参考useActualParamName属性的作用
         if (config.isUseActualParamName()) {
+          // 获取参数名
           name = getActualParamName(method, paramIndex);
         }
         if (name == null) {
-          // use the parameter index as the name ("0", "1", ...)
-          // gcode issue #71
           name = String.valueOf(map.size());
         }
       }
+      // 將参数信息存放在Map中，Key为参数位置索引，Value为参数名称
       map.put(paramIndex, name);
     }
+    // 將参数信息保存在names属性中
     names = Collections.unmodifiableSortedMap(map);
   }
 
   private String getActualParamName(Method method, int paramIndex) {
-    return ParamNameUtil.getParamNames(method).get(paramIndex);
+    if (Jdk.parameterExists) {
+      return ParamNameUtil.getParamNames(method).get(paramIndex);
+    }
+    return null;
   }
 
   private static boolean isSpecialParameter(Class<?> clazz) {
@@ -114,7 +121,7 @@ public class ParamNameResolver {
     } else if (!hasParamAnnotation && paramCount == 1) {
       return args[names.firstKey()];
     } else {
-      final Map<String, Object> param = new ParamMap<>();
+      final Map<String, Object> param = new ParamMap<Object>();
       int i = 0;
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
         param.put(entry.getValue(), args[entry.getKey()]);

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2015 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 
@@ -47,12 +46,10 @@ public class TypeAliasRegistryTest {
     typeAliasRegistry.registerAlias("string", String.class);
   }
 
-  @Test
+  @Test(expected = TypeException.class)
   public void shouldNotBeAbleToRegisterSameAliasWithDifferentType() {
     TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
-    assertThrows(TypeException.class, () -> {
-      typeAliasRegistry.registerAlias("string", BigDecimal.class);
-    });
+    typeAliasRegistry.registerAlias("string", BigDecimal.class);
   }
 
   @Test

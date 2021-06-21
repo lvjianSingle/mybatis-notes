@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.apache.ibatis.reflection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import static com.googlecode.catchexception.apis.BDDCatchException.*;
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -31,26 +31,25 @@ public class ReflectorTest {
   public void testGetSetterType() throws Exception {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Section.class);
-    Assertions.assertEquals(Long.class, reflector.getSetterType("id"));
+    Assert.assertEquals(Long.class, reflector.getSetterType("id"));
   }
 
   @Test
   public void testGetGetterType() throws Exception {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Section.class);
-    Assertions.assertEquals(Long.class, reflector.getGetterType("id"));
+    Assert.assertEquals(Long.class, reflector.getGetterType("id"));
   }
 
   @Test
   public void shouldNotGetClass() throws Exception {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Section.class);
-    Assertions.assertFalse(reflector.hasGetter("class"));
+    Assert.assertFalse(reflector.hasGetter("class"));
   }
 
   static interface Entity<T> {
     T getId();
-
     void setId(T id);
   }
 
@@ -138,31 +137,24 @@ public class ReflectorTest {
     protected T[] array;
     private T fld;
     public T pubFld;
-
     public T getId() {
       return id;
     }
-
     public void setId(T id) {
       this.id = id;
     }
-
     public List<T> getList() {
       return list;
     }
-
     public void setList(List<T> list) {
       this.list = list;
     }
-
     public T[] getArray() {
       return array;
     }
-
     public void setArray(T[] array) {
       this.array = array;
     }
-
     public T getFld() {
       return fld;
     }

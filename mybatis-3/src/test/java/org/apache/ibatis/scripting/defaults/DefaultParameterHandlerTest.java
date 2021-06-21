@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeException;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -62,10 +62,10 @@ public class DefaultParameterHandlerTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     try {
       defaultParameterHandler.setParameters(ps);
-      Assertions.fail("Should have thrown TypeException");
+      Assert.fail("Should have thrown TypeException");
     } catch (Exception e) {
-      Assertions.assertTrue(e instanceof TypeException, "expected TypeException");
-      Assertions.assertTrue(e.getMessage().contains("mapping: ParameterMapping"));
+      Assert.assertTrue("expected TypeException", e instanceof TypeException);
+      Assert.assertTrue("", e.getMessage().contains("mapping: ParameterMapping"));
     }
 
   }

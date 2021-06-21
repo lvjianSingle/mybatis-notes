@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2016 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.apache.ibatis.mapping;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Clinton Begin
@@ -31,19 +31,33 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 public class ResultMapping {
 
   private Configuration configuration;
+  // Java实体属性
   private String property;
+  // 数据库字段名称
   private String column;
+  // Java类型
   private Class<?> javaType;
+  // JDBC类型
   private JdbcType jdbcType;
+  // 对应的类型处理器
   private TypeHandler<?> typeHandler;
+  // 嵌套ResultMap的Id
   private String nestedResultMapId;
+  // 嵌套查询Id
   private String nestedQueryId;
+  // 通过notNullColumn属性配置的数据库非空字段
   private Set<String> notNullColumns;
+  // 通过columnPrefix属性配置的字段前缀信息
   private String columnPrefix;
+  // 用于标识<id>标签和<constructor>标签
   private List<ResultFlag> flags;
+  // 组合映射
   private List<ResultMapping> composites;
+  // resultSet属性信息
   private String resultSet;
+  // 外键信息
   private String foreignColumn;
+  // 是否懒加载
   private boolean lazy;
 
   ResultMapping() {
@@ -67,8 +81,8 @@ public class ResultMapping {
     public Builder(Configuration configuration, String property) {
       resultMapping.configuration = configuration;
       resultMapping.property = property;
-      resultMapping.flags = new ArrayList<>();
-      resultMapping.composites = new ArrayList<>();
+      resultMapping.flags = new ArrayList<ResultFlag>();
+      resultMapping.composites = new ArrayList<ResultMapping>();
       resultMapping.lazy = configuration.isLazyLoadingEnabled();
     }
 
@@ -131,7 +145,7 @@ public class ResultMapping {
       resultMapping.lazy = lazy;
       return this;
     }
-
+    
     public ResultMapping build() {
       // lock down collections
       resultMapping.flags = Collections.unmodifiableList(resultMapping.flags);
@@ -168,7 +182,7 @@ public class ResultMapping {
         }
       }
     }
-
+    
     private void resolveTypeHandler() {
       if (resultMapping.typeHandler == null && resultMapping.javaType != null) {
         Configuration configuration = resultMapping.configuration;
@@ -250,7 +264,7 @@ public class ResultMapping {
   public void setLazy(boolean lazy) {
     this.lazy = lazy;
   }
-
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) {

@@ -15,7 +15,7 @@
  */
 package org.apache.ibatis.submitted.xml_external_ref;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -25,8 +25,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class ShortNameTest {
     @Test
@@ -37,13 +36,12 @@ public class ShortNameTest {
         assertNotNull(selectPet);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void ambiguousShortNameShouldFail() throws Exception {
         Configuration configuration = getConfiguration();
         // ambiguous short name should throw an exception.
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-          configuration.getMappedStatement("select");
-        });
+        MappedStatement ambiguousStatement = configuration.getMappedStatement("select");
+        fail("If there are multiple statements with the same name, an exception should be thrown.");
     }
 
     private Configuration getConfiguration() throws IOException {

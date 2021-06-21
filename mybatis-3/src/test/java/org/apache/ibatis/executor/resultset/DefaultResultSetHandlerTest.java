@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2016 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.apache.ibatis.executor.resultset;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,13 +46,13 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultResultSetHandlerTest {
 
   @Mock
@@ -68,7 +68,7 @@ public class DefaultResultSetHandlerTest {
 
   /**
    * Contrary to the spec, some drivers require case-sensitive column names when getting result.
-   *
+   * 
    * @see <a href="http://code.google.com/p/mybatis/issues/detail?id=557">Issue 557</a>
    */
   @Test
@@ -88,6 +88,7 @@ public class DefaultResultSetHandlerTest {
     when(rs.getType()).thenReturn(ResultSet.TYPE_FORWARD_ONLY);
     when(rs.next()).thenReturn(true).thenReturn(false);
     when(rs.getInt("CoLuMn1")).thenReturn(100);
+    when(rs.wasNull()).thenReturn(false);
     when(rsmd.getColumnCount()).thenReturn(1);
     when(rsmd.getColumnLabel(1)).thenReturn("CoLuMn1");
     when(rsmd.getColumnType(1)).thenReturn(Types.INTEGER);
@@ -122,10 +123,10 @@ public class DefaultResultSetHandlerTest {
     try {
       defaultResultSetHandler.createParameterizedResultObject(rsw, null/*resultType*/, constructorMappings,
               null/*constructorArgTypes*/, null/*constructorArgs*/, null/*columnPrefix*/);
-      Assertions.fail("Should have thrown ExecutorException");
+      Assert.fail("Should have thrown ExecutorException");
     } catch (Exception e) {
-      Assertions.assertTrue(e instanceof ExecutorException, "Expected ExecutorException");
-      Assertions.assertTrue(e.getMessage().contains("mapping: " + resultMapping.toString()));
+      Assert.assertTrue("Expected ExecutorException", e instanceof ExecutorException);
+      Assert.assertTrue("", e.getMessage().contains("mapping: " + resultMapping.toString()));
     }
   }
 

@@ -23,9 +23,9 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static com.googlecode.catchexception.apis.BDDCatchException.*;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -34,7 +34,7 @@ public class MapperExtendTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // create an SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/mapper_extend/mybatis-config.xml")) {
@@ -51,16 +51,17 @@ public class MapperExtendTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       ParentMapper mapper = sqlSession.getMapper(Mapper.class);
       User user = mapper.getUserXML();
-      Assertions.assertEquals("User1", user.getName());
+      Assert.assertEquals("User1", user.getName());
     }
   }
+
 
   @Test
   public void shouldGetAUserWithAnExtendedAnnotatedMethod() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       ParentMapper mapper = sqlSession.getMapper(Mapper.class);
       User user = mapper.getUserAnnotated();
-      Assertions.assertEquals("User1", user.getName());
+      Assert.assertEquals("User1", user.getName());
     }
   }
 
@@ -69,7 +70,7 @@ public class MapperExtendTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       ParentMapper mapper = sqlSession.getMapper(MapperOverload.class);
       User user = mapper.getUserXML();
-      Assertions.assertEquals("User2", user.getName());
+      Assert.assertEquals("User2", user.getName());
     }
   }
 
@@ -78,7 +79,7 @@ public class MapperExtendTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       ParentMapper mapper = sqlSession.getMapper(MapperOverload.class);
       User user = mapper.getUserAnnotated();
-      Assertions.assertEquals("User2", user.getName());
+      Assert.assertEquals("User2", user.getName());
     }
   }
 
@@ -87,7 +88,7 @@ public class MapperExtendTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       ChildMapper mapper = sqlSession.getMapper(ChildMapper.class);
       User user = mapper.getUserByName("User1");
-      Assertions.assertNotNull(user);
+      Assert.assertNotNull(user);
     }
   }
 

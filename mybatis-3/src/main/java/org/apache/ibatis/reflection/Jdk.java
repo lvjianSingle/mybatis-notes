@@ -24,9 +24,7 @@ public class Jdk {
 
   /**
    * <code>true</code> if <code>java.lang.reflect.Parameter</code> is available.
-   * @deprecated Since 3.5.0, Will remove this field at feature(next major version up)
    */
-  @Deprecated
   public static final boolean parameterExists;
 
   static {
@@ -40,10 +38,6 @@ public class Jdk {
     parameterExists = available;
   }
 
-  /**
-   * @deprecated Since 3.5.0, Will remove this field at feature(next major version up)
-   */
-  @Deprecated
   public static final boolean dateAndTimeApiExists;
 
   static {
@@ -57,10 +51,6 @@ public class Jdk {
     dateAndTimeApiExists = available;
   }
 
-  /**
-   * @deprecated Since 3.5.0, Will remove this field at feature(next major version up)
-   */
-  @Deprecated
   public static final boolean optionalExists;
 
   static {

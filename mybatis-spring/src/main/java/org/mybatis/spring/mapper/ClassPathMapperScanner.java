@@ -115,14 +115,13 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   public void registerFilters() {
     boolean acceptAllInterfaces = true;
-
-    // if specified, use the given annotation and / or marker interface
+    // 扫描特定注解
     if (this.annotationClass != null) {
       addIncludeFilter(new AnnotationTypeFilter(this.annotationClass));
       acceptAllInterfaces = false;
     }
 
-    // override AssignableTypeFilter to ignore matches on the actual marker interface
+    // 扫描特定接口实现类
     if (this.markerInterface != null) {
       addIncludeFilter(new AssignableTypeFilter(this.markerInterface) {
         @Override
@@ -132,13 +131,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       });
       acceptAllInterfaces = false;
     }
-
+    // 扫描所有接口
     if (acceptAllInterfaces) {
-      // default include filter that accepts all classes
       addIncludeFilter((metadataReader, metadataReaderFactory) -> true);
     }
 
-    // exclude package-info.java
+    // 排除package-info.java
     addExcludeFilter((metadataReader, metadataReaderFactory) -> {
       String className = metadataReader.getClassMetadata().getClassName();
       return className.endsWith("package-info");
@@ -152,11 +150,13 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    // 调用父类的doScan（）方法，將包中的Class转换为BeanDefinitionHolder对象
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
       LOGGER.warn(() -> "No MyBatis mapper was found in '" + Arrays.toString(basePackages) + "' package. Please check your configuration.");
     } else {
+      // 对BeanDefinitionHolder进行处理
       processBeanDefinitions(beanDefinitions);
     }
 
@@ -166,6 +166,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
   private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
     GenericBeanDefinition definition;
     for (BeanDefinitionHolder holder : beanDefinitions) {
+      // 获取BeanDefinition对象
       definition = (GenericBeanDefinition) holder.getBeanDefinition();
       String beanClassName = definition.getBeanClassName();
       LOGGER.debug(() -> "Creating MapperFactoryBean with name '" + holder.getBeanName()
@@ -173,9 +174,10 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
-      definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName);
+      // 將BeanDefinition对象的beanClass属性设置为MapperFactoryBean
       definition.setBeanClass(this.mapperFactoryBean.getClass());
-
+      // 修改BeanDefinition对象的propertyValues属性，將sqlSessionFactory注入到MapperFactoryBean中
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 
       boolean explicitFactoryUsed = false;

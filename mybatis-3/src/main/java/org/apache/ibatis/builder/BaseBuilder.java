@@ -59,8 +59,8 @@ public abstract class BaseBuilder {
   }
 
   protected Set<String> stringSetValueOf(String value, String defaultValue) {
-    value = value == null ? defaultValue : value;
-    return new HashSet<>(Arrays.asList(value.split(",")));
+    value = (value == null ? defaultValue : value);
+    return new HashSet<String>(Arrays.asList(value.split(",")));
   }
 
   protected JdbcType resolveJdbcType(String alias) {

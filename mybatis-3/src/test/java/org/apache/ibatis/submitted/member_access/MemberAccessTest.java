@@ -28,10 +28,10 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
  * Tests for member access of Java Object.
@@ -40,7 +40,7 @@ public class MemberAccessTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     try (Reader reader = Resources
         .getResourceAsReader("org/apache/ibatis/submitted/member_access/mybatis-config.xml")) {

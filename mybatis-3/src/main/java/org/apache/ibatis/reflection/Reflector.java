@@ -49,13 +49,13 @@ public class Reflector {
   private final Class<?> type;
   private final String[] readablePropertyNames;
   private final String[] writeablePropertyNames;
-  private final Map<String, Invoker> setMethods = new HashMap<>();
-  private final Map<String, Invoker> getMethods = new HashMap<>();
-  private final Map<String, Class<?>> setTypes = new HashMap<>();
-  private final Map<String, Class<?>> getTypes = new HashMap<>();
+  private final Map<String, Invoker> setMethods = new HashMap<String, Invoker>();
+  private final Map<String, Invoker> getMethods = new HashMap<String, Invoker>();
+  private final Map<String, Class<?>> setTypes = new HashMap<String, Class<?>>();
+  private final Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
   private Constructor<?> defaultConstructor;
 
-  private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
+  private Map<String, String> caseInsensitivePropertyMap = new HashMap<String, String>();
 
   public Reflector(Class<?> clazz) {
     type = clazz;
@@ -77,13 +77,22 @@ public class Reflector {
     Constructor<?>[] consts = clazz.getDeclaredConstructors();
     for (Constructor<?> constructor : consts) {
       if (constructor.getParameterTypes().length == 0) {
+        if (canControlMemberAccessible()) {
+          try {
+            constructor.setAccessible(true);
+          } catch (Exception e) {
+            // Ignored. This is only a final precaution, nothing we can do.
+          }
+        }
+        if (constructor.isAccessible()) {
           this.defaultConstructor = constructor;
+        }
       }
     }
   }
 
   private void addGetMethods(Class<?> cls) {
-    Map<String, List<Method>> conflictingGetters = new HashMap<>();
+    Map<String, List<Method>> conflictingGetters = new HashMap<String, List<Method>>();
     Method[] methods = getClassMethods(cls);
     for (Method method : methods) {
       if (method.getParameterTypes().length > 0) {
@@ -143,7 +152,7 @@ public class Reflector {
   }
 
   private void addSetMethods(Class<?> cls) {
-    Map<String, List<Method>> conflictingSetters = new HashMap<>();
+    Map<String, List<Method>> conflictingSetters = new HashMap<String, List<Method>>();
     Method[] methods = getClassMethods(cls);
     for (Method method : methods) {
       String name = method.getName();
@@ -158,7 +167,11 @@ public class Reflector {
   }
 
   private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
-    List<Method> list = conflictingMethods.computeIfAbsent(name, k -> new ArrayList<>());
+    List<Method> list = conflictingMethods.get(name);
+    if (list == null) {
+      list = new ArrayList<Method>();
+      conflictingMethods.put(name, list);
+    }
     list.add(method);
   }
 
@@ -229,7 +242,7 @@ public class Reflector {
         result = Array.newInstance((Class<?>) componentType, 0).getClass();
       } else {
         Class<?> componentClass = typeToClass(componentType);
-        result = Array.newInstance(componentClass, 0).getClass();
+        result = Array.newInstance((Class<?>) componentClass, 0).getClass();
       }
     }
     if (result == null) {
@@ -241,17 +254,26 @@ public class Reflector {
   private void addFields(Class<?> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
-      if (!setMethods.containsKey(field.getName())) {
-        // issue #379 - removed the check for final because JDK 1.5 allows
-        // modification of final fields through reflection (JSR-133). (JGB)
-        // pr #16 - final static can only be set by the classloader
-        int modifiers = field.getModifiers();
-        if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
-          addSetField(field);
+      if (canControlMemberAccessible()) {
+        try {
+          field.setAccessible(true);
+        } catch (Exception e) {
+          // Ignored. This is only a final precaution, nothing we can do.
         }
       }
-      if (!getMethods.containsKey(field.getName())) {
-        addGetField(field);
+      if (field.isAccessible()) {
+        if (!setMethods.containsKey(field.getName())) {
+          // issue #379 - removed the check for final because JDK 1.5 allows
+          // modification of final fields through reflection (JSR-133). (JGB)
+          // pr #16 - final static can only be set by the classloader
+          int modifiers = field.getModifiers();
+          if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
+            addSetField(field);
+          }
+        }
+        if (!getMethods.containsKey(field.getName())) {
+          addGetField(field);
+        }
       }
     }
     if (clazz.getSuperclass() != null) {
@@ -279,7 +301,7 @@ public class Reflector {
     return !(name.startsWith("$") || "serialVersionUID".equals(name) || "class".equals(name));
   }
 
-  /**
+  /*
    * This method returns an array containing all methods
    * declared in this class and any superclass.
    * We use this method, instead of the simpler Class.getMethods(),
@@ -289,7 +311,7 @@ public class Reflector {
    * @return An array containing all methods in this class
    */
   private Method[] getClassMethods(Class<?> cls) {
-    Map<String, Method> uniqueMethods = new HashMap<>();
+    Map<String, Method> uniqueMethods = new HashMap<String, Method>();
     Class<?> currentClass = cls;
     while (currentClass != null && currentClass != Object.class) {
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
@@ -317,6 +339,14 @@ public class Reflector {
         // if it is known, then an extended class must have
         // overridden a method
         if (!uniqueMethods.containsKey(signature)) {
+          if (canControlMemberAccessible()) {
+            try {
+              currentMethod.setAccessible(true);
+            } catch (Exception e) {
+              // Ignored. This is only a final precaution, nothing we can do.
+            }
+          }
+
           uniqueMethods.put(signature, currentMethod);
         }
       }
@@ -360,7 +390,7 @@ public class Reflector {
     return true;
   }
 
-  /**
+  /*
    * Gets the name of the class the instance provides information for
    *
    * @return The class name
@@ -397,11 +427,11 @@ public class Reflector {
     return method;
   }
 
-  /**
+  /*
    * Gets the type for a property setter
    *
    * @param propertyName - the name of the property
-   * @return The Class of the property setter
+   * @return The Class of the propery setter
    */
   public Class<?> getSetterType(String propertyName) {
     Class<?> clazz = setTypes.get(propertyName);
@@ -411,11 +441,11 @@ public class Reflector {
     return clazz;
   }
 
-  /**
+  /*
    * Gets the type for a property getter
    *
    * @param propertyName - the name of the property
-   * @return The Class of the property getter
+   * @return The Class of the propery getter
    */
   public Class<?> getGetterType(String propertyName) {
     Class<?> clazz = getTypes.get(propertyName);
@@ -425,7 +455,7 @@ public class Reflector {
     return clazz;
   }
 
-  /**
+  /*
    * Gets an array of the readable properties for an object
    *
    * @return The array
@@ -434,8 +464,8 @@ public class Reflector {
     return readablePropertyNames;
   }
 
-  /**
-   * Gets an array of the writable properties for an object
+  /*
+   * Gets an array of the writeable properties for an object
    *
    * @return The array
    */
@@ -443,17 +473,17 @@ public class Reflector {
     return writeablePropertyNames;
   }
 
-  /**
-   * Check to see if a class has a writable property by name
+  /*
+   * Check to see if a class has a writeable property by name
    *
    * @param propertyName - the name of the property to check
-   * @return True if the object has a writable property by the name
+   * @return True if the object has a writeable property by the name
    */
   public boolean hasSetter(String propertyName) {
     return setMethods.keySet().contains(propertyName);
   }
 
-  /**
+  /*
    * Check to see if a class has a readable property by name
    *
    * @param propertyName - the name of the property to check

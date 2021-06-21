@@ -24,15 +24,15 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class CamelCaseMappingTest {
 
   protected static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/camelcase/MapperConfig.xml")) {
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
@@ -46,9 +46,9 @@ public class CamelCaseMappingTest {
   public void testList() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       List<Camel> list = sqlSession.selectList("org.apache.ibatis.submitted.camel.doSelect");
-      Assertions.assertTrue(list.size() > 0);
-      Assertions.assertNotNull(list.get(0).getFirstName());
-      Assertions.assertNull(list.get(0).getLAST_NAME());
+      Assert.assertTrue(list.size() > 0);
+      Assert.assertNotNull(list.get(0).getFirstName());
+      Assert.assertNull(list.get(0).getLAST_NAME());
     }
   }
 
@@ -56,8 +56,8 @@ public class CamelCaseMappingTest {
   public void testMap() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       List<Map<String, Object>> list = sqlSession.selectList("org.apache.ibatis.submitted.camel.doSelectMap");
-      Assertions.assertTrue(list.size() > 0);
-      Assertions.assertTrue(list.get(0).containsKey("LAST_NAME"));
+      Assert.assertTrue(list.size() > 0);
+      Assert.assertTrue(list.get(0).containsKey("LAST_NAME"));
     }
   }
 

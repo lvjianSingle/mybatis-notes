@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,33 +19,46 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.OffsetTime;
+
+import org.apache.ibatis.lang.UsesJava8;
 
 /**
  * @since 3.4.5
  * @author Tomas Rohovsky
  */
+@UsesJava8
 public class OffsetTimeTypeHandler extends BaseTypeHandler<OffsetTime> {
 
   @Override
   public void setNonNullParameter(PreparedStatement ps, int i, OffsetTime parameter, JdbcType jdbcType)
           throws SQLException {
-    ps.setObject(i, parameter);
+    ps.setTime(i, Time.valueOf(parameter.toLocalTime()));
   }
 
   @Override
   public OffsetTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
-    return rs.getObject(columnName, OffsetTime.class);
+    Time time = rs.getTime(columnName);
+    return getOffsetTime(time);
   }
 
   @Override
   public OffsetTime getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-    return rs.getObject(columnIndex, OffsetTime.class);
+    Time time = rs.getTime(columnIndex);
+    return getOffsetTime(time);
   }
 
   @Override
   public OffsetTime getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-    return cs.getObject(columnIndex, OffsetTime.class);
+    Time time = cs.getTime(columnIndex);
+    return getOffsetTime(time);
   }
 
+  private static OffsetTime getOffsetTime(Time time) {
+    if (time != null) {
+      return time.toLocalTime().atOffset(OffsetTime.now().getOffset());
+    }
+    return null;
+  }
 }

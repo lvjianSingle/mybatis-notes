@@ -1,5 +1,5 @@
 /**
- *    Copyright 2010-2019 the original author or authors.
+ *    Copyright 2010-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,14 +46,14 @@ import com.mockrunner.mock.jdbc.MockDataSource;
  * <p>
  * This test works fine with Spring 3.1 and 3.2 but with 3.1 the registrar is called twice.
  */
-class MapperScanTest {
+public final class MapperScanTest {
   private AnnotationConfigApplicationContext applicationContext;
 
   @BeforeEach
   void setupContext() {
     applicationContext = new AnnotationConfigApplicationContext();
 
-    setupSqlSessionFactory();
+    setupSqlSessionFactory("sqlSessionFactory");
 
     // assume support for autowiring fields is added by MapperScannerConfigurer
     // via
@@ -195,11 +195,11 @@ class MapperScanTest {
         .isSameAs(Object.class);
   }
 
-  private void setupSqlSessionFactory() {
+  private void setupSqlSessionFactory(String name) {
     GenericBeanDefinition definition = new GenericBeanDefinition();
     definition.setBeanClass(SqlSessionFactoryBean.class);
     definition.getPropertyValues().add("dataSource", new MockDataSource());
-    applicationContext.registerBeanDefinition("sqlSessionFactory", definition);
+    applicationContext.registerBeanDefinition(name, definition);
   }
 
   private void assertBeanNotLoaded(String name) {
@@ -225,7 +225,7 @@ class MapperScanTest {
   }
 
   @Test
-  void testScanWithExplicitSqlSessionTemplate() {
+  void testScanWithExplicitSqlSessionTemplate() throws Exception {
     GenericBeanDefinition definition = new GenericBeanDefinition();
     definition.setBeanClass(SqlSessionTemplate.class);
     ConstructorArgumentValues constructorArgs = new ConstructorArgumentValues();

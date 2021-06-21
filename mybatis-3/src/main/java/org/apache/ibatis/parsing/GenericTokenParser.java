@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,15 +34,20 @@ public class GenericTokenParser {
     if (text == null || text.isEmpty()) {
       return "";
     }
-    // search open token
-    int start = text.indexOf(openToken);
+    // 获取第一个openToken在SQL中的位置
+    int start = text.indexOf(openToken, 0);
+    // start为-1说明SQL中不存在任何参数占位符
     if (start == -1) {
       return text;
     }
+    // 將SQL转换为char数组
     char[] src = text.toCharArray();
+    // offset用于记录已解析的#{或者}的偏移量，避免重复解析
     int offset = 0;
     final StringBuilder builder = new StringBuilder();
+    // expression为参数占位符中的内容
     StringBuilder expression = null;
+    // 遍历获取所有参数占位符的内容，然后调用TokenHandler的handleToken（）方法替换参数占位符
     while (start > -1) {
       if (start > 0 && src[start - 1] == '\\') {
         // this open token is escaped. remove the backslash and continue.
@@ -75,6 +80,7 @@ public class GenericTokenParser {
           builder.append(src, start, src.length - start);
           offset = src.length;
         } else {
+          // 调用TokenHandler的handleToken（）方法替换参数占位符
           builder.append(handler.handleToken(expression.toString()));
           offset = end + closeToken.length();
         }
@@ -84,6 +90,7 @@ public class GenericTokenParser {
     if (offset < src.length) {
       builder.append(src, offset, src.length - offset);
     }
+
     return builder.toString();
   }
 }

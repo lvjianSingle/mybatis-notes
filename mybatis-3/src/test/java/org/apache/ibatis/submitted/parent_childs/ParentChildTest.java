@@ -23,15 +23,15 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ParentChildTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // create a SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/parent_childs/mybatis-config.xml")) {
@@ -48,13 +48,13 @@ public class ParentChildTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       List<Parent> parents = mapper.getParents();
-      Assertions.assertEquals(2, parents.size());
+      Assert.assertEquals(2, parents.size());
       Parent firstParent = parents.get(0);
-      Assertions.assertEquals("Jose", firstParent.getName());
-      Assertions.assertEquals(2, firstParent.getChilds().size());
+      Assert.assertEquals("Jose", firstParent.getName());
+      Assert.assertEquals(2, firstParent.getChilds().size());
       Parent secondParent = parents.get(1);
-      Assertions.assertEquals("Juan", secondParent.getName());
-      Assertions.assertEquals(0, secondParent.getChilds().size()); // note an empty list is inyected
+      Assert.assertEquals("Juan", secondParent.getName());
+      Assert.assertEquals(0, secondParent.getChilds().size()); // note an empty list is inyected
     }
   }
 

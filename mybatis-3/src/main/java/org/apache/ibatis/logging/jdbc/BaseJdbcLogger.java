@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,19 +31,19 @@ import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
  * Base class for proxies to do logging
- *
+ * 
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
 public abstract class BaseJdbcLogger {
 
-  protected static final Set<String> SET_METHODS = new HashSet<>();
-  protected static final Set<String> EXECUTE_METHODS = new HashSet<>();
+  protected static final Set<String> SET_METHODS = new HashSet<String>();
+  protected static final Set<String> EXECUTE_METHODS = new HashSet<String>();
 
-  private final Map<Object, Object> columnMap = new HashMap<>();
+  private final Map<Object, Object> columnMap = new HashMap<Object, Object>();
 
-  private final List<Object> columnNames = new ArrayList<>();
-  private final List<Object> columnValues = new ArrayList<>();
+  private final List<Object> columnNames = new ArrayList<Object>();
+  private final List<Object> columnValues = new ArrayList<Object>();
 
   protected Log statementLog;
   protected int queryStack;
@@ -103,7 +103,7 @@ public abstract class BaseJdbcLogger {
   }
 
   protected String getParameterValueString() {
-    List<Object> typeList = new ArrayList<>(columnValues.size());
+    List<Object> typeList = new ArrayList<Object>(columnValues.size());
     for (Object value : columnValues) {
       if (value == null) {
         typeList.add("null");

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2010-2019 the original author or authors.
+ *    Copyright 2010-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
  */
 package org.mybatis.spring.transaction;
 
-import static org.springframework.util.Assert.notNull;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.transaction.Transaction;
 import org.mybatis.logging.Logger;
 import org.mybatis.logging.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import static org.springframework.util.Assert.notNull;
 
 /**
  * {@code SpringManagedTransaction} handles the lifecycle of a JDBC connection.
@@ -79,6 +78,7 @@ public class SpringManagedTransaction implements Transaction {
    * so we need to no-op that calls.
    */
   private void openConnection() throws SQLException {
+    // 通过Spring中的DataSourceUtils工具类获取Connection对象
     this.connection = DataSourceUtils.getConnection(this.dataSource);
     this.autoCommit = this.connection.getAutoCommit();
     this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
@@ -117,7 +117,7 @@ public class SpringManagedTransaction implements Transaction {
    * {@inheritDoc}
    */
   @Override
-  public void close() {
+  public void close() throws SQLException {
     DataSourceUtils.releaseConnection(this.connection, this.dataSource);
   }
     
@@ -125,7 +125,7 @@ public class SpringManagedTransaction implements Transaction {
    * {@inheritDoc}
    */
   @Override
-  public Integer getTimeout() {
+  public Integer getTimeout() throws SQLException {
     ConnectionHolder holder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
     if (holder != null && holder.hasTimeout()) {
       return holder.getTimeToLiveInSeconds();

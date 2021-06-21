@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2015 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.apache.ibatis.io.Resources;
  */
 public class TypeAliasRegistry {
 
-  private final Map<String, Class<?>> TYPE_ALIASES = new HashMap<>();
+  private final Map<String, Class<?>> TYPE_ALIASES = new HashMap<String, Class<?>>();
 
   public TypeAliasRegistry() {
     registerAlias("string", String.class);
@@ -126,7 +126,7 @@ public class TypeAliasRegistry {
   }
 
   public void registerAliases(String packageName, Class<?> superType){
-    ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+    ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
     Set<Class<? extends Class<?>>> typeSet = resolverUtil.getClasses();
     for(Class<?> type : typeSet){
@@ -143,7 +143,7 @@ public class TypeAliasRegistry {
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
     if (aliasAnnotation != null) {
       alias = aliasAnnotation.value();
-    }
+    } 
     registerAlias(alias, type);
   }
 
@@ -166,7 +166,7 @@ public class TypeAliasRegistry {
       throw new TypeException("Error registering type alias "+alias+" for "+value+". Cause: " + e, e);
     }
   }
-
+  
   /**
    * @since 3.2.2
    */

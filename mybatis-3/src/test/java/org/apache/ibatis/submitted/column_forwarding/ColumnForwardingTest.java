@@ -22,15 +22,15 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ColumnForwardingTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // create a SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/column_forwarding/mybatis-config.xml")) {
@@ -47,12 +47,12 @@ public class ColumnForwardingTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       User user = mapper.getUser(1);
-      Assertions.assertNotNull(user);
-      Assertions.assertNotNull(user.getId());
-      Assertions.assertEquals("active", user.getState());
-      Assertions.assertNotNull(user.getGroup());
-      Assertions.assertNotNull(user.getGroup().getId());
-      Assertions.assertEquals("active", user.getGroup().getState());
+      Assert.assertNotNull(user);
+      Assert.assertNotNull(user.getId());
+      Assert.assertEquals("active", user.getState());
+      Assert.assertNotNull(user.getGroup());
+      Assert.assertNotNull(user.getGroup().getId());
+      Assert.assertEquals("active", user.getGroup().getState());
     }
   }
 
@@ -61,10 +61,10 @@ public class ColumnForwardingTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       User user = mapper.getUser(2);
-      Assertions.assertNotNull(user);
-      Assertions.assertNotNull(user.getId());
-      Assertions.assertNull(user.getState());
-      Assertions.assertNull(user.getGroup());
+      Assert.assertNotNull(user);
+      Assert.assertNotNull(user.getId());
+      Assert.assertNull(user.getState());
+      Assert.assertNull(user.getGroup());
     }
   }
 }

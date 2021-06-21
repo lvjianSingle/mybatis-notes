@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.apache.ibatis.scripting.xmltags;
 
-import java.util.regex.Pattern;
-
 import org.apache.ibatis.parsing.GenericTokenParser;
 import org.apache.ibatis.parsing.TokenHandler;
 import org.apache.ibatis.scripting.ScriptingException;
 import org.apache.ibatis.type.SimpleTypeRegistry;
+
+import java.util.regex.Pattern;
 
 /**
  * @author Clinton Begin
@@ -39,6 +39,7 @@ public class TextSqlNode implements SqlNode {
   }
 
   public boolean isDynamic() {
+    // 判断是否属于动态SQL，当SQL中有${}参数占位符时，即认为属于动态SQL
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
     GenericTokenParser parser = createParser(checker);
     parser.parse(text);
@@ -47,7 +48,9 @@ public class TextSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 通过GenericTokenParser对象解析${}参数占位符，使用BindingTokenParser对象处理参数占位符内容
     GenericTokenParser parser = createParser(new BindingTokenParser(context, injectionFilter));
+    // 调用GenericTokenParser对象的parse（）方法解析
     context.appendSql(parser.parse(text));
     return true;
   }
@@ -68,15 +71,19 @@ public class TextSqlNode implements SqlNode {
 
     @Override
     public String handleToken(String content) {
+      // 获取Mybatis内置参数_parameter，_parameter属性中保存所有参数信息
       Object parameter = context.getBindings().get("_parameter");
       if (parameter == null) {
         context.getBindings().put("value", null);
       } else if (SimpleTypeRegistry.isSimpleType(parameter.getClass())) {
+        // 將参数对象添加到ContextMap对象中
         context.getBindings().put("value", parameter);
       }
+      // 通过OGNL表达式获取参数值
       Object value = OgnlCache.getValue(content, context.getBindings());
-      String srtValue = value == null ? "" : String.valueOf(value); // issue #274 return "" instead of "null"
+      String srtValue = (value == null ? "" : String.valueOf(value)); // issue #274 return "" instead of "null"
       checkInjection(srtValue);
+      // 返回参数值
       return srtValue;
     }
 
@@ -86,7 +93,7 @@ public class TextSqlNode implements SqlNode {
       }
     }
   }
-
+  
   private static class DynamicCheckerTokenParser implements TokenHandler {
 
     private boolean isDynamic;
@@ -105,5 +112,5 @@ public class TextSqlNode implements SqlNode {
       return null;
     }
   }
-
+  
 }

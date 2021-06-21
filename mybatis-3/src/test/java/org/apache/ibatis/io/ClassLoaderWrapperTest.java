@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2015 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 package org.apache.ibatis.io;
 
 import org.apache.ibatis.BaseDataTest;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ClassLoaderWrapperTest extends BaseDataTest {
 
@@ -31,7 +29,8 @@ public class ClassLoaderWrapperTest extends BaseDataTest {
   private final String CLASS_NOT_FOUND = "some.random.class.that.does.not.Exist";
   private final String CLASS_FOUND = "java.lang.Object";
 
-  @BeforeEach
+
+  @Before
   public void beforeClassLoaderWrapperTest() {
     wrapper = new ClassLoaderWrapper();
     loader = getClass().getClassLoader();
@@ -42,11 +41,9 @@ public class ClassLoaderWrapperTest extends BaseDataTest {
     assertNotNull(wrapper.classForName(CLASS_FOUND));
   }
 
-  @Test
+  @Test(expected = ClassNotFoundException.class)
   public void classForNameNotFound() throws ClassNotFoundException {
-    Assertions.assertThrows(ClassNotFoundException.class, () -> {
-      assertNotNull(wrapper.classForName(CLASS_NOT_FOUND));
-    });
+    assertNotNull(wrapper.classForName(CLASS_NOT_FOUND));
   }
 
   @Test

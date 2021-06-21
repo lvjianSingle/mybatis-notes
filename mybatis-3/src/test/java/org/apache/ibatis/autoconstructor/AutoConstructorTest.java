@@ -22,19 +22,17 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.Reader;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class AutoConstructorTest {
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // create a SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/autoconstructor/mybatis-config.xml")) {
@@ -43,7 +41,7 @@ public class AutoConstructorTest {
 
     // populate in-memory database
     BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
-        "org/apache/ibatis/autoconstructor/CreateDB.sql");
+            "org/apache/ibatis/autoconstructor/CreateDB.sql");
   }
 
   @Test
@@ -51,17 +49,23 @@ public class AutoConstructorTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
       final Object subject = mapper.getSubject(1);
-      assertNotNull(subject);
+      Assert.assertNotNull(subject);
+    }
+  }
+
+  @Test(expected = PersistenceException.class)
+  public void primitiveSubjects() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
+      mapper.getSubjects();
     }
   }
 
   @Test
-  public void primitiveSubjects() {
+  public void wrapperSubject() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
-      assertThrows(PersistenceException.class, () -> {
-        mapper.getSubjects();
-      });
+      verifySubjects(mapper.getWrapperSubjects());
     }
   }
 
@@ -73,26 +77,16 @@ public class AutoConstructorTest {
     }
   }
 
-  @Test
+  @Test(expected = PersistenceException.class)
   public void badSubject() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
-      assertThrows(PersistenceException.class, () -> {
-        mapper.getBadSubjects();
-      });
-    }
-  }
-
-  @Test
-  public void extensiveSubject() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
-      verifySubjects(mapper.getExtensiveSubject());
+      mapper.getBadSubjects();
     }
   }
 
   private void verifySubjects(final List<?> subjects) {
-    assertNotNull(subjects);
+    Assert.assertNotNull(subjects);
     Assertions.assertThat(subjects.size()).isEqualTo(3);
   }
 }

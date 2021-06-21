@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +15,17 @@
  */
 package org.apache.ibatis.datasource.pooled;
 
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+
+import javax.sql.DataSource;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * This is a simple, synchronous, thread-safe database connection pool.
@@ -95,22 +91,22 @@ public class PooledDataSource implements DataSource {
   }
 
   @Override
-  public void setLoginTimeout(int loginTimeout) {
+  public void setLoginTimeout(int loginTimeout) throws SQLException {
     DriverManager.setLoginTimeout(loginTimeout);
   }
 
   @Override
-  public int getLoginTimeout() {
+  public int getLoginTimeout() throws SQLException {
     return DriverManager.getLoginTimeout();
   }
 
   @Override
-  public void setLogWriter(PrintWriter logWriter) {
+  public void setLogWriter(PrintWriter logWriter) throws SQLException {
     DriverManager.setLogWriter(logWriter);
   }
 
   @Override
-  public PrintWriter getLogWriter() {
+  public PrintWriter getLogWriter() throws SQLException {
     return DriverManager.getLogWriter();
   }
 
@@ -149,7 +145,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * The maximum number of active connections
    *
    * @param poolMaximumActiveConnections The maximum number of active connections
@@ -159,7 +155,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * The maximum number of idle connections
    *
    * @param poolMaximumIdleConnections The maximum number of idle connections
@@ -169,7 +165,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * The maximum number of tolerance for bad connection happens in one thread
     * which are applying for new {@link PooledConnection}
    *
@@ -183,7 +179,7 @@ public class PooledDataSource implements DataSource {
     this.poolMaximumLocalBadConnectionTolerance = poolMaximumLocalBadConnectionTolerance;
   }
 
-  /**
+  /*
    * The maximum time a connection can be used before it *may* be
    * given away again.
    *
@@ -194,7 +190,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * The time to wait before retrying to get a connection
    *
    * @param poolTimeToWait The time to wait
@@ -204,7 +200,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * The query to be used to check a connection
    *
    * @param poolPingQuery The query
@@ -214,7 +210,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * Determines if the ping query should be used.
    *
    * @param poolPingEnabled True if we need to check a connection before using it
@@ -224,7 +220,7 @@ public class PooledDataSource implements DataSource {
     forceCloseAll();
   }
 
-  /**
+  /*
    * If a connection has not been used in this many milliseconds, ping the
    * database to make sure the connection is still good.
    *
@@ -420,14 +416,14 @@ public class PooledDataSource implements DataSource {
                 } catch (SQLException e) {
                   /*
                      Just log a message for debug and continue to execute the following
-                     statement like nothing happened.
+                     statement like nothing happend.
                      Wrap the bad connection with a new PooledConnection, this will help
-                     to not interrupt current executing thread and give current thread a
-                     chance to join the next competition for another valid/good database
+                     to not intterupt current executing thread and give current thread a
+                     chance to join the next competion for another valid/good database
                      connection. At the end of this loop, bad {@link @conn} will be set as null.
                    */
                   log.debug("Bad connection. Could not roll back");
-                }
+                }  
               }
               conn = new PooledConnection(oldestActiveConnection.getRealConnection(), this);
               conn.setCreatedTimestamp(oldestActiveConnection.getCreatedTimestamp());
@@ -496,7 +492,7 @@ public class PooledDataSource implements DataSource {
     return conn;
   }
 
-  /**
+  /*
    * Method to check to see if a connection is still usable
    *
    * @param conn - the connection to check
@@ -522,9 +518,10 @@ public class PooledDataSource implements DataSource {
               log.debug("Testing connection " + conn.getRealHashCode() + " ...");
             }
             Connection realConn = conn.getRealConnection();
-            try (Statement statement = realConn.createStatement()) {
-              statement.executeQuery(poolPingQuery).close();
-            }
+            Statement statement = realConn.createStatement();
+            ResultSet rs = statement.executeQuery(poolPingQuery);
+            rs.close();
+            statement.close();
             if (!realConn.getAutoCommit()) {
               realConn.rollback();
             }
@@ -550,7 +547,7 @@ public class PooledDataSource implements DataSource {
     return result;
   }
 
-  /**
+  /*
    * Unwraps a pooled connection to get to the 'real' connection
    *
    * @param conn - the pooled connection to unwrap
@@ -575,7 +572,7 @@ public class PooledDataSource implements DataSource {
     throw new SQLException(getClass().getName() + " is not a wrapper.");
   }
 
-  public boolean isWrapperFor(Class<?> iface) {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
     return false;
   }
 

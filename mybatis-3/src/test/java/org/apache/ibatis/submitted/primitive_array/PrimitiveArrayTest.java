@@ -22,15 +22,15 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class PrimitiveArrayTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // create an SqlSessionFactory
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/primitive_array/mybatis-config.xml")) {
@@ -47,9 +47,9 @@ public class PrimitiveArrayTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       User user = mapper.getUser(1);
-      Assertions.assertEquals("User1", user.getName());
-      Assertions.assertEquals(2, user.getNum().length);
-      Assertions.assertEquals(100, user.getNum()[0]);
+      Assert.assertEquals("User1", user.getName());
+      Assert.assertEquals(2, user.getNum().length);
+      Assert.assertEquals(100, user.getNum()[0]);
     }
   }
 

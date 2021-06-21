@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2015 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,26 +37,20 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object> {
 
   @Override
   public Object getNullableResult(ResultSet rs, String columnName) throws SQLException {
-    return extractArray(rs.getArray(columnName));
+    Array array = rs.getArray(columnName);
+    return array == null ? null : array.getArray();
   }
 
   @Override
   public Object getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-    return extractArray(rs.getArray(columnIndex));
+    Array array = rs.getArray(columnIndex);
+    return array == null ? null : array.getArray();
   }
 
   @Override
   public Object getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-    return extractArray(cs.getArray(columnIndex));
-  }
-
-  protected Object extractArray(Array array) throws SQLException {
-    if (array == null) {
-      return null;
-    }
-    Object result = array.getArray();
-    array.free();
-    return result;
+    Array array = cs.getArray(columnIndex);
+    return array == null ? null : array.getArray();
   }
 
 }

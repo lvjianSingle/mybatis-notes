@@ -15,9 +15,9 @@
  */
 package org.apache.ibatis.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Properties;
 
 import org.apache.ibatis.BaseDataTest;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class ResourcesTest extends BaseDataTest {
 
@@ -126,11 +125,9 @@ public class ResourcesTest extends BaseDataTest {
     assertNotNull(clazz);
   }
 
-  @Test
+  @Test(expected = ClassNotFoundException.class)
   public void shouldNotFindThisClass() throws ClassNotFoundException {
-    Assertions.assertThrows(ClassNotFoundException.class, () -> {
-      Resources.classForName("some.random.class.that.does.not.Exist");
-    });
+    Resources.classForName("some.random.class.that.does.not.Exist");
   }
 
   @Test

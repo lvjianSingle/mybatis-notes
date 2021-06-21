@@ -24,16 +24,16 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class DuplicateStatementsTest {
 
   private SqlSessionFactory sqlSessionFactory;
 
-  @BeforeEach
+  @Before
   public void setupDb() throws Exception {
       // create a SqlSessionFactory
       try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/duplicate_statements/mybatis-config.xml")) {
@@ -50,7 +50,7 @@ public class DuplicateStatementsTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       List<User> users = mapper.getAllUsers();
-      Assertions.assertEquals(10, users.size());
+      Assert.assertEquals(10, users.size());
     }
   }
 
@@ -59,36 +59,34 @@ public class DuplicateStatementsTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Mapper mapper = sqlSession.getMapper(Mapper.class);
       List<User> users = mapper.getAllUsers(new RowBounds(0, 4));
-      Assertions.assertEquals(4, users.size());
+      Assert.assertEquals(4, users.size());
     }
   }
 
   @Test
-  @Disabled("fails currently - issue 507")
+  @Ignore("fails currently - issue 507")
   public void shouldGetAllUsers_Annotated() {
     sqlSessionFactory.getConfiguration().addMapper(AnnotatedMapper.class);
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       AnnotatedMapper mapper = sqlSession.getMapper(AnnotatedMapper.class);
       List<User> users = mapper.getAllUsers();
-      Assertions.assertEquals(10, users.size());
+      Assert.assertEquals(10, users.size());
     }
   }
 
   @Test
-  @Disabled("fails currently - issue 507")
+  @Ignore("fails currently - issue 507")
   public void shouldGetFirstFourUsers_Annotated() {
     sqlSessionFactory.getConfiguration().addMapper(AnnotatedMapper.class);
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       AnnotatedMapper mapper = sqlSession.getMapper(AnnotatedMapper.class);
       List<User> users = mapper.getAllUsers(new RowBounds(0, 4));
-      Assertions.assertEquals(4, users.size());
+      Assert.assertEquals(4, users.size());
     }
   }
 
-  @Test
+  @Test(expected=IllegalArgumentException.class)
   public void shouldFailForDuplicateMethod() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      sqlSessionFactory.getConfiguration().addMapper(AnnotatedMapperExtended.class);
-    });
+    sqlSessionFactory.getConfiguration().addMapper(AnnotatedMapperExtended.class);
   }
 }

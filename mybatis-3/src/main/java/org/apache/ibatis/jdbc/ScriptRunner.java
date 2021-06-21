@@ -101,12 +101,15 @@ public class ScriptRunner {
   }
 
   public void runScript(Reader reader) {
+    // 设置事务是否自动提交
     setAutoCommit();
-
     try {
+      // 是否一次性批量执行脚本文件中的所有SQL语句
       if (sendFullScript) {
+        // 调用executeFullScript（）方法一次性执行脚本文件中的所有SQL语句
         executeFullScript(reader);
       } else {
+        // 调用executeLineByLine（）方法逐条执行脚本中的SQL语句
         executeLineByLine(reader);
       }
     } finally {

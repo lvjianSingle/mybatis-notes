@@ -19,8 +19,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -61,7 +61,7 @@ public class FolderMapperTest {
 
         List<FolderFlatTree> folders = postMapper.findWithSubFolders("Root");
 
-        Assertions.assertEquals(3, folders.size());
+        Assert.assertEquals(3, folders.size());
       }
     }
   }

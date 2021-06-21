@@ -22,15 +22,15 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class CglibNPELazyTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void initDatabase() throws Exception {
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/cglib_lazy_error/ibatisConfigLazy.xml")) {
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
@@ -47,9 +47,9 @@ public class CglibNPELazyTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
       Person person = personMapper.selectById(1);
-      Assertions.assertNotNull(person, "Persons must not be null");
+      Assert.assertNotNull("Persons must not be null", person);
       Person parent = person.getParent();
-      Assertions.assertNull(parent, "Parent must be null");
+      Assert.assertNull("Parent must be null", parent);
     }
   }
 
@@ -58,9 +58,9 @@ public class CglibNPELazyTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
       Person person = personMapper.selectById(1);
-      Assertions.assertNotNull(person, "Persons must not be null");
+      Assert.assertNotNull("Persons must not be null", person);
       Person ancestor = person.getAncestor();
-      Assertions.assertEquals(person, ancestor, "Ancestor must be John Smith sr.");
+      Assert.assertEquals("Ancestor must be John Smith sr.", person, ancestor);
     }
   }
 
@@ -71,10 +71,10 @@ public class CglibNPELazyTest {
       Person expectedAncestor = personMapper.selectById(1);
       Person person = personMapper.selectById(3);
       // Load ancestor indirectly.
-      Assertions.assertNotNull(person, "Persons must not be null");
-      Assertions.assertNotNull(person.getParent(), "Parent must not be null");
-      Assertions.assertNotNull(person.getParent().getParent(), "Grandparent must not be null");
-      Assertions.assertEquals(expectedAncestor, person.getAncestor(), "Ancestor must be John Smith sr.");
+      Assert.assertNotNull("Persons must not be null", person);
+      Assert.assertNotNull("Parent must not be null", person.getParent());
+      Assert.assertNotNull("Grandparent must not be null", person.getParent().getParent());
+      Assert.assertEquals("Ancestor must be John Smith sr.", expectedAncestor, person.getAncestor());
     }
   }
 
@@ -85,11 +85,11 @@ public class CglibNPELazyTest {
       Person expectedParent = personMapper.selectById(2);
       Person expectedGrandParent = personMapper.selectById(1);
       Person person = personMapper.selectById(3);
-      Assertions.assertNotNull(person, "Persons must not be null");
+      Assert.assertNotNull("Persons must not be null", person);
       final Person actualParent = person.getParent();
       final Person actualGrandParent = person.getParent().getParent();
-      Assertions.assertEquals(expectedParent, actualParent);
-      Assertions.assertEquals(expectedGrandParent, actualGrandParent);
+      Assert.assertEquals(expectedParent, actualParent);
+      Assert.assertEquals(expectedGrandParent, actualGrandParent);
     }
   }
 
@@ -99,9 +99,9 @@ public class CglibNPELazyTest {
       PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
       Person expectedAncestor = personMapper.selectById(1);
       Person person = personMapper.selectById(3);
-      Assertions.assertNotNull(person, "Persons must not be null");
+      Assert.assertNotNull("Persons must not be null", person);
       final Person actualAncestor = person.getAncestor();
-      Assertions.assertEquals(expectedAncestor, actualAncestor);
+      Assert.assertEquals(expectedAncestor, actualAncestor);
     }
   }
 

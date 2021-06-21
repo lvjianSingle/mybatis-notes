@@ -19,19 +19,12 @@ import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -39,12 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 public class ScriptRunnerTest extends BaseDataTest {
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator", "\n");
 
   @Test
-  @Disabled("This fails with HSQLDB 2.0 due to the create index statements in the schema script")
+  @Ignore("This fails with HSQLDB 2.0 due to the create index statements in the schema script")
   public void shouldRunScriptsBySendingFullScriptAtOnce() throws Exception {
     DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
     Connection conn = ds.getConnection();

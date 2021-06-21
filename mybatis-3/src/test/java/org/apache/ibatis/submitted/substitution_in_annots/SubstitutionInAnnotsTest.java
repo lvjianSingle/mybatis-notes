@@ -15,7 +15,7 @@
  */
 package org.apache.ibatis.submitted.substitution_in_annots;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
@@ -25,14 +25,15 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 
 public class SubstitutionInAnnotsTest {
 
   protected static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     Configuration configuration = new Configuration();
     Environment environment = new Environment("test", new JdbcTransactionFactory(), new UnpooledDataSource("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:annots", null));
@@ -59,7 +60,7 @@ public class SubstitutionInAnnotsTest {
       assertEquals("Barney", mapper.getPersonNameByIdWithAnnotsValue(4));
     }
   }
-
+  
   @Test
   public void testSubstitutionWithAnnotsParameter() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {

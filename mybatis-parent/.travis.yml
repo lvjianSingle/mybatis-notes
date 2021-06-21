@@ -1,8 +1,9 @@
 language: java
+sudo: false
 
 jdk:
-  - oraclejdk11
   - oraclejdk8
+  - openjdk8
 
 after_success:
   - chmod -R 777 ./travis/after_success.sh

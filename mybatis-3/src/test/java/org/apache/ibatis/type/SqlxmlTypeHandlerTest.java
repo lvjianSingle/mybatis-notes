@@ -16,7 +16,7 @@
 
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,17 +34,18 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.test.EmbeddedPostgresqlTests;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.mockito.Mock;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import ru.yandex.qatools.embed.postgresql.util.SocketUtil;
 
-@Tag("EmbeddedPostgresqlTests")
+@Category(EmbeddedPostgresqlTests.class)
 public class SqlxmlTypeHandlerTest extends BaseTypeHandlerTest {
   private static final TypeHandler<String> TYPE_HANDLER = new SqlxmlTypeHandler();
   private static final EmbeddedPostgres postgres = new EmbeddedPostgres();
@@ -57,7 +58,7 @@ public class SqlxmlTypeHandlerTest extends BaseTypeHandlerTest {
   @Mock
   private Connection connection;
 
-  @BeforeAll
+  @BeforeClass
   public static void setUp() throws Exception {
     // Launch PostgreSQL server. Download / unarchive if necessary.
     String url = postgres.start(
@@ -75,7 +76,7 @@ public class SqlxmlTypeHandlerTest extends BaseTypeHandlerTest {
             "org/apache/ibatis/type/SqlxmlTypeHandlerTest.sql");
   }
 
-  @AfterAll
+  @AfterClass
   public static void tearDown() {
     postgres.stop();
   }
