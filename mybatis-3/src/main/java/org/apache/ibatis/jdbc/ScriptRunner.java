@@ -40,17 +40,29 @@ public class ScriptRunner {
 
   private final Connection connection;
 
+  //SQL异常是否中断程序执行
   private boolean stopOnError;
+  //是否抛出SQLWarning警告
   private boolean throwWarning;
+  //是否自动提交
   private boolean autoCommit;
+
+  //属性为true时，批量执行文件中的SQL语句
+  //属性为false时，逐条执行SQL语句，默认情况下 SQL语句以分号分割
   private boolean sendFullScript;
+  //是否去除windows系统换行符的\r
   private boolean removeCRs;
+  //设置statement属性是否执行转义处理
   private boolean escapeProcessing = true;
 
+  //日志输出位置，默认标准输入输出，既控制台打印
   private PrintWriter logWriter = new PrintWriter(System.out);
+  //错误日志的输出位置，默认控制台打印
   private PrintWriter errorLogWriter = new PrintWriter(System.err);
 
+  //脚本文件中的SQL语句的分隔符，默认为分号 --> ;
   private String delimiter = DEFAULT_DELIMITER;
+  //是否支付SQL语句分隔符，单独占一行
   private boolean fullLineDelimiter;
 
   public ScriptRunner(Connection connection) {
@@ -200,18 +212,24 @@ public class ScriptRunner {
 
   private void handleLine(StringBuilder command, String line) throws SQLException {
     String trimmedLine = line.trim();
+    //判断该行是否是SQL注释
     if (lineIsComment(trimmedLine)) {
       Matcher matcher = DELIMITER_PATTERN.matcher(trimmedLine);
       if (matcher.find()) {
         delimiter = matcher.group(5);
       }
       println(trimmedLine);
+      //判断该行是否包含分号
+      //如果本行包含分号，则说明该行是一条完整SQL的结尾。需要截取分号之前的SQL内容，与前面读取到的不包含分号的行一起组成一条完整的SQL语句执行。
     } else if (commandReadyToExecute(trimmedLine)) {
+      //获取该行中分号之前的内容
       command.append(line.substring(0, line.lastIndexOf(delimiter)));
       command.append(LINE_SEPARATOR);
       println(command);
+      //执行该条完整的SQL语句
       executeStatement(command.toString());
       command.setLength(0);
+      //该行中不包含分号，说明这条SQL语句未结束，追加本行内容到之前读取的内容中。
     } else if (trimmedLine.length() > 0) {
       command.append(line);
       command.append(LINE_SEPARATOR);

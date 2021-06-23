@@ -221,10 +221,12 @@ public class SqlRunner {
       List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
       List<String> columns = new ArrayList<String>();
       List<TypeHandler<?>> typeHandlers = new ArrayList<TypeHandler<?>>();
+      //1、获取ResultSetMetaData对象，通过ResultSetMetaData对象获取所有的列名
       ResultSetMetaData rsmd = rs.getMetaData();
       for (int i = 0, n = rsmd.getColumnCount(); i < n; i++) {
         columns.add(rsmd.getColumnLabel(i + 1));
         try {
+          //2、获取列的JDBC类型，根据类型获取TypeHandler对象
           Class<?> type = Resources.classForName(rsmd.getColumnClassName(i + 1));
           TypeHandler<?> typeHandler = typeHandlerRegistry.getTypeHandler(type);
           if (typeHandler == null) {
@@ -235,11 +237,13 @@ public class SqlRunner {
           typeHandlers.add(typeHandlerRegistry.getTypeHandler(Object.class));
         }
       }
+      //3、遍历ResultSet对象，将ResultSet对象中的记录行转换为Map对象
       while (rs.next()) {
         Map<String, Object> row = new HashMap<String, Object>();
         for (int i = 0, n = columns.size(); i < n; i++) {
           String name = columns.get(i);
           TypeHandler<?> handler = typeHandlers.get(i);
+          //4、通过TypeHandler对象的getResult()方法将JDBC类型转换为Java类型
           row.put(name.toUpperCase(Locale.ENGLISH), handler.getResult(rs, name));
         }
         list.add(row);
