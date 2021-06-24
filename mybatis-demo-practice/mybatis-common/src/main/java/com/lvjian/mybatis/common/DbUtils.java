@@ -23,7 +23,7 @@ public abstract class DbUtils {
 
         try {
             // 加载HSQLDB驱动
-            Class.forName("org.hsqldb.jdbcDriver");
+//            Class.forName("org.hsqldb.jdbcDriver");
             // 获取Connection对象
             conn = DriverManager.getConnection("jdbc:hsqldb:mem:mybatis","sa", "");
 
