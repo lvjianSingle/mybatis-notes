@@ -49,14 +49,20 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.reflection.Jdk;
 
 /**
+ * 建立JDBC类型、Java类型与TypeHandler之间的映射关系
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public final class TypeHandlerRegistry {
 
+  //JDBC类型<=>TypeHandler
   private final Map<JdbcType, TypeHandler<?>> JDBC_TYPE_HANDLER_MAP = new EnumMap<JdbcType, TypeHandler<?>>(JdbcType.class);
+  //Java类型<=>JDBC类型<=>TypeHandler
   private final Map<Type, Map<JdbcType, TypeHandler<?>>> TYPE_HANDLER_MAP = new ConcurrentHashMap<Type, Map<JdbcType, TypeHandler<?>>>();
+  //
   private final TypeHandler<Object> UNKNOWN_TYPE_HANDLER = new UnknownTypeHandler(this);
+  //TypeHandler Class对象<=>TypeHandler
   private final Map<Class<?>, TypeHandler<?>> ALL_TYPE_HANDLERS_MAP = new HashMap<Class<?>, TypeHandler<?>>();
 
   private static final Map<JdbcType, TypeHandler<?>> NULL_TYPE_HANDLER_MAP = Collections.emptyMap();
@@ -456,14 +462,14 @@ public final class TypeHandlerRegistry {
       }
     }
   }
-  
+
   // get information
-  
+
   /**
    * @since 3.2.2
    */
   public Collection<TypeHandler<?>> getTypeHandlers() {
     return Collections.unmodifiableCollection(ALL_TYPE_HANDLERS_MAP.values());
   }
-  
+
 }
