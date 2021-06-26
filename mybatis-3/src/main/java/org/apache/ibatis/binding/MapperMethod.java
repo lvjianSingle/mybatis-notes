@@ -45,7 +45,14 @@ import java.util.*;
  */
 public class MapperMethod {
 
+    /**
+     * SqlCommand对象用于获取SQL语句的类型、Mapper的Id等信息
+     */
     private final SqlCommand command;
+
+    /**
+     * MethodSignature对象用于获取方法的签名信息，例如Mapper方法的参数名、参数注解等信息
+     */
     private final MethodSignature method;
 
     public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
