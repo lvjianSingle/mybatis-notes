@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lvjian.mybaits.chapter.mapper.UserMapper">
+<mapper namespace="UserMapper">
 
     <cache eviction="FIFO" flushInterval="36000" size="512" readOnly="true" type="org.mybatis.caches.redis.RedisCache" blocking="false"/>
 
@@ -9,13 +9,13 @@
         id, create_time, name, password, phone, nick_name
     </sql>
 
-    <select id="listAllUser" resultType="com.lvjian.mybaits.chapter.entity.UserEntity" useCache="true" flushCache="false">
+    <select id="listAllUser" resultType="UserEntity" useCache="true" flushCache="false">
         select
         <include refid="userAllField"/>
         from user
     </select>
 
-    <select id="getUserByEntity" resultType="com.lvjian.mybaits.chapter.entity.UserEntity">
+    <select id="getUserByEntity" resultType="UserEntity">
         select
         <include refid="userAllField"/>
         from user
@@ -32,7 +32,7 @@
         </where>
     </select>
 
-    <select id="getUserByPhone" resultType="com.lvjian.mybaits.chapter.entity.UserEntity">
+    <select id="getUserByPhone" resultType="UserEntity">
         select
         <include refid="userAllField"/>
         from user
