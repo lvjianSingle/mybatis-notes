@@ -39,7 +39,10 @@
             <artifactId>asm</artifactId>
             <version>3.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.lvjian.mybatis</groupId>
+            <artifactId>mybatis-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -23,7 +23,10 @@
             <artifactId>mybatis-redis</artifactId>
             <version>1.0.0-beta3-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.lvjian.mybatis</groupId>
+            <artifactId>mybatis-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
