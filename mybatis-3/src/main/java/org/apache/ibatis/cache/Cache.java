@@ -19,13 +19,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * SPI for cache providers.
- * 
+ *
  * One instance of cache will be created for each namespace.
- * 
+ *
  * The cache implementation must have a constructor that receives the cache id as an String parameter.
- * 
+ *
  * MyBatis will pass the namespace as id to the constructor.
- * 
+ *
  * <pre>
  * public MyCache(final String id) {
  *  if (id == null) {
@@ -42,56 +42,71 @@ import java.util.concurrent.locks.ReadWriteLock;
 public interface Cache {
 
   /**
+   * 该方法用于获取缓存的Id，通常情况下缓存的Id为Mapper的命名空间名称。
+   *
    * @return The identifier of this cache
    */
   String getId();
 
   /**
+   * 该方法用于将一个Java对象添加到缓存中，该方法有两个参数，第一个参数为缓存的Key，即CacheKey的实例；第二个参数为需要缓存的对象。
+   *
    * @param key Can be any object but usually it is a {@link CacheKey}
    * @param value The result of a select.
    */
   void putObject(Object key, Object value);
 
   /**
+   * 该方法用于获取缓存Key对应的缓存对象。
+   *
    * @param key The key
    * @return The object stored in the cache.
    */
   Object getObject(Object key);
 
   /**
-   * As of 3.3.0 this method is only called during a rollback 
+   *
+   * 该方法用于将一个对象从缓存中移除。
+   *
+   * As of 3.3.0 this method is only called during a rollback
    * for any previous value that was missing in the cache.
-   * This lets any blocking cache to release the lock that 
+   * This lets any blocking cache to release the lock that
    * may have previously put on the key.
-   * A blocking cache puts a lock when a value is null 
+   * A blocking cache puts a lock when a value is null
    * and releases it when the value is back again.
-   * This way other threads will wait for the value to be 
+   * This way other threads will wait for the value to be
    * available instead of hitting the database.
    *
-   * 
+   *
    * @param key The key
    * @return Not used
    */
   Object removeObject(Object key);
 
   /**
+   * 该方法用于清空缓存。
+   *
    * Clears this cache instance
-   */  
+   */
   void clear();
 
   /**
+   * 存储在缓存中的元素数量
+   *
    * Optional. This method is not called by the core.
-   * 
+   *
    * @return The number of elements stored in the cache (not its capacity).
    */
   int getSize();
-  
-  /** 
+
+  /**
+   * 该方法返回一个ReadWriteLock对象，该方法在3.2.6版本后已经不再使用。缓存所需的任何锁定都必须由缓存提供者在内部提供
+   *
    * Optional. As of 3.2.6 this method is no longer called by the core.
-   *  
+   *
    * Any locking needed by the cache must be provided internally by the cache provider.
-   * 
-   * @return A ReadWriteLock 
+   *
+   * @return A ReadWriteLock
    */
   ReadWriteLock getReadWriteLock();
 

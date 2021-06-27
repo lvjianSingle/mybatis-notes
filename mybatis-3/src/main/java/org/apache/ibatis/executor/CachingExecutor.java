@@ -35,6 +35,9 @@ import java.util.List;
 public class CachingExecutor implements Executor {
 
   private final Executor delegate;
+  /**
+   * TransactionalCacheManager用于管理所有的二级缓存对象
+   */
   private final TransactionalCacheManager tcm = new TransactionalCacheManager();
 
   public CachingExecutor(Executor delegate) {
@@ -51,7 +54,7 @@ public class CachingExecutor implements Executor {
   public void close(boolean forceRollback) {
     try {
       //issues #499, #524 and #573
-      if (forceRollback) { 
+      if (forceRollback) {
         tcm.rollback();
       } else {
         tcm.commit();
@@ -166,7 +169,7 @@ public class CachingExecutor implements Executor {
 
   private void flushCacheIfRequired(MappedStatement ms) {
     Cache cache = ms.getCache();
-    if (cache != null && ms.isFlushCacheRequired()) {      
+    if (cache != null && ms.isFlushCacheRequired()) {
       tcm.clear(cache);
     }
   }

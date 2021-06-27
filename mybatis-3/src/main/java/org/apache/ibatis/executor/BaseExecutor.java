@@ -52,8 +52,10 @@ public abstract class BaseExecutor implements Executor {
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
   // Mybatis一级缓存对象
+  //用于缓存MyBatis查询结果
   protected PerpetualCache localCache;
   // 存储过程输出参数缓存
+  //用于缓存存储过程调用结果
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
@@ -352,7 +354,7 @@ public abstract class BaseExecutor implements Executor {
   public void setExecutorWrapper(Executor wrapper) {
     this.wrapper = wrapper;
   }
-  
+
   private static class DeferredLoad {
 
     private final MetaObject resultObject;
