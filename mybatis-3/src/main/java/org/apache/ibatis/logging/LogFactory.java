@@ -85,34 +85,42 @@ public final class LogFactory {
     }
   }
 
+  //自定义日志实现
   public static synchronized void useCustomLogging(Class<? extends Log> clazz) {
     setImplementation(clazz);
   }
 
+  //使用Slf4j框架输出日志
   public static synchronized void useSlf4jLogging() {
     setImplementation(org.apache.ibatis.logging.slf4j.Slf4jImpl.class);
   }
 
+  //使用JCL框架输出日志
   public static synchronized void useCommonsLogging() {
     setImplementation(org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl.class);
   }
 
+  //使用Log4J框架输出日志
   public static synchronized void useLog4JLogging() {
     setImplementation(org.apache.ibatis.logging.log4j.Log4jImpl.class);
   }
 
+  //使用Log4J 2框架输出日志
   public static synchronized void useLog4J2Logging() {
     setImplementation(org.apache.ibatis.logging.log4j2.Log4j2Impl.class);
   }
 
+  //使用JUC输出日志
   public static synchronized void useJdkLogging() {
     setImplementation(org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl.class);
   }
 
+  //控制台打印输出日志
   public static synchronized void useStdOutLogging() {
     setImplementation(org.apache.ibatis.logging.stdout.StdOutImpl.class);
   }
 
+  //不输出日志
   public static synchronized void useNoLogging() {
     setImplementation(org.apache.ibatis.logging.nologging.NoLoggingImpl.class);
   }
@@ -138,7 +146,9 @@ public final class LogFactory {
       }
       // 记录当前使用的日志实现类的Constructor对象
       logConstructor = candidate;
+      System.out.println("创建日志接口实例[" + implClass.getName() + "]成功，将使用该实例进行日志输出。");
     } catch (Throwable t) {
+      System.out.println("未查找到日志框架相关的JAR包，创建日志接口实例[" + implClass.getName() + "]时发生了异常");
       throw new LogException("Error setting Log implementation.  Cause: " + t, t);
     }
   }
