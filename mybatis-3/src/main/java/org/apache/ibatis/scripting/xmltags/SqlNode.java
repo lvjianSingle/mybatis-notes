@@ -19,5 +19,13 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 public interface SqlNode {
+
+  /**
+   * 该方法用于解析SQL节点，根据参数信息生成静态SQL内容
+   *
+   * @param context DynamicContext对象中封装了Mapper调用时传入的参数信息及MyBatis内置的_parameter和_databaseId参数。
+   * @return
+   */
   boolean apply(DynamicContext context);
+
 }
