@@ -328,6 +328,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   public void handleRowValues(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler<?> resultHandler, RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
     // 是否有嵌套ResultMap
+    //当使用<association>或<collection>标签通过JOIN查询方式进行级联映射时，hasNestedResultMaps()方法的返回值为true。
     if (resultMap.hasNestedResultMaps()) {
       // 嵌套查询校验RowBounds，可以通过设置safeRowBoundsEnabled=false参数绕过校验
       ensureNoRowBounds();
