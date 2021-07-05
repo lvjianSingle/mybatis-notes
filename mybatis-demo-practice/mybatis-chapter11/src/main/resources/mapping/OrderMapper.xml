@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvjian.mybatis.cascade.mapper.OrderMapper">
+
+    <resultMap id="detailMap" type="com.lvjian.mybatis.cascade.entity.Order">
+        <association property="user" javaType="com.lvjian.mybatis.cascade.entity.User"
+                     select="com.lvjian.mybatis.cascade.mapper.UserMapper.getUserById" column="userId">
+        </association>
+    </resultMap>
+
+
+    <resultMap  id="detailNestMap" type="com.lvjian.mybatis.cascade.entity.Order">
+        <id column="id" property="id"/>
+        <result column="createTime" property="createTime"/>
+        <result column="userId" property="userId"/>
+        <result column="amount" property="amount"/>
+        <result column="orderNo" property="orderNo"/>
+        <result column="address" property="address"/>
+        <association property="user"  javaType="com.lvjian.mybatis.cascade.entity.User" >
+            <id column="userId" property="id"/>
+            <result column="name" property="name"/>
+            <result column="createTime" property="createTime"/>
+            <result column="password" property="password"/>
+            <result column="phone" property="phone"/>
+            <result column="nickName" property="nickName"/>
+        </association>
+    </resultMap>
+
+    <select id="listOrdersByUserId" resultType="com.lvjian.mybatis.cascade.entity.Order">
+       select * from "order" where userId = #{userId}
+    </select>
+
+    <select id="getOrderByNo" resultMap="detailMap">
+       select * from "order" where orderNo = #{orderNo}
+    </select>
+
+    <select id="getOrderByNoWithJoin" resultMap="detailNestMap">
+       select o.*,u.* from "order" o left join user u on (u.id = o.userId) where orderNo = #{orderNo}
+    </select>
+
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lvjian.mybatis.cascade.mapper.UserMapper">
+
+
+    <resultMap id="detailMap" type="com.lvjian.mybatis.cascade.entity.User">
+        <collection property="orders" ofType="com.lvjian.mybatis.cascade.entity.Order"
+                    select="com.lvjian.mybatis.cascade.mapper.OrderMapper.listOrdersByUserId"
+                    javaType="java.util.ArrayList" column="id">
+        </collection>
+    </resultMap>
+
+
+    <resultMap autoMapping="true" id="detailMapForJoin" type="com.lvjian.mybatis.cascade.entity.User">
+        <collection property="orders" ofType="com.lvjian.mybatis.cascade.entity.Order">
+            <id column="id" property="id"/>
+            <result column="createTime" property="createTime"/>
+            <result column="userId" property="userId"/>
+            <result column="amount" property="amount"/>
+            <result column="orderNo" property="orderNo"/>
+            <result column="address" property="address"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="userDetailMap" type="com.lvjian.mybatis.cascade.entity.User">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="createTime" column="createTime"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <resultMap id="detailMapForDiscriminator" type="com.lvjian.mybatis.cascade.entity.User">
+        <discriminator javaType="String" column="gender">
+            <case value="female" resultType="com.lvjian.mybatis.cascade.entity.User">
+                <collection javaType="java.util.ArrayList" column="id"
+                            property="orders" ofType="com.lvjian.mybatis.cascade.entity.Order"
+                            select="com.lvjian.mybatis.cascade.mapper.OrderMapper.listOrdersByUserId">
+                </collection>
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <select id="getUserById" resultType="com.lvjian.mybatis.cascade.entity.User">
+        select * from user where id = #{userId}
+    </select>
+
+    <select id="getUserByIdFull" resultMap="detailMap">
+        select * from user where id = #{userId}
+    </select>
+
+    <select id="getUserByIdForJoin" resultMap="detailMapForJoin">
+        select u.*,o.* from user u left join "order" o on (o.userId = u.id) where u.id = #{userId}
+    </select>
+
+    <select id="getUserByIdForUserDetailMap" resultMap="userDetailMap">
+        select * from user where id = #{userId}
+    </select>
+
+    <select id="getUserByIdForDiscriminator" resultMap="detailMapForDiscriminator">
+        select * from user where id = #{userId}
+    </select>
+
+    <select id="getUsersByPhone" resultMap="detailMapForJoin">
+        select u.*,o.* from user u left join "order" o on (o.userId = u.id) where u.phone = #{phone}
+    </select>
+
+</mapper>
+
+
+
